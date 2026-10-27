@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+.env
+adhd_quiz_results.csv
+adhd_results.csv
