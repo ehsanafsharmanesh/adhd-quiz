@@ -6,17 +6,17 @@
     <title>پرسشنامه تشخیص ADHD (والدین)</title>
     
     <style>
-        /* --- تنظیمات فونت محلی --- */
+        /* --- تنظیمات فونت محلی (اصلاح شده برای مسیر static) --- */
         @font-face {
             font-family: 'Vazirmatn';
-            src: url('./Vazirmatn-Regular.woff2') format('woff2');
+            src: url('./static/mycustomfonts/Vazirmatn-Regular.woff2') format('woff2');
             font-weight: 400;
             font-style: normal;
             font-display: swap;
         }
         @font-face {
             font-family: 'Vazirmatn';
-            src: url('./Vazirmatn-Bold.woff2') format('woff2');
+            src: url('./static/mycustomfonts/Vazirmatn-Bold.woff2') format('woff2');
             font-weight: 700;
             font-style: normal;
             font-display: swap;
@@ -179,7 +179,6 @@
         .score-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 15px; color: var(--text-main); }
         .score-value {
             font-size: 3rem; font-weight: 700; color: var(--primary); line-height: 1;
-            /* افکت چشمک زدن نمره */
             animation: pulseGlow 2s infinite;
         }
         .score-total { font-size: 1rem; color: var(--text-muted); margin-top: 10px; }
