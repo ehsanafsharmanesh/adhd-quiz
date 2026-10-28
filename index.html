@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پرسشنامه تشخیص ADHD (والدین)</title>
+    <!-- استفاده از CDN فونت وزیرمتن برای سرعت بالا -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        :root {
+            --primary: #0056b3;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --bg: #f0f4f8;
+            --text: #333;
+        }
+        * { box-sizing: border-box; font-family: 'Vazirmatn', sans-serif; }
+        body {
+            margin: 0; padding: 20px; background-color: var(--bg); color: var(--text);
+            display: flex; justify-content: center; align-items: flex-start; min-height: 100vh;
+        }
+        .container {
+            max-width: 700px; width: 100%; background: #fff; padding: 30px;
+            border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            display: none; /* مخفی کردن همه صفحات در ابتدا */
+        }
+        .container.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        h1 { text-align: center; color: var(--primary); font-size: 1.6em; margin-bottom: 10px; }
+        h3 { text-align: center; color: #555; font-size: 1.1em; font-weight: 400; margin-bottom: 30px; }
+        
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        input[type="text"] {
+            width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px;
+            font-size: 1em; transition: border-color 0.3s;
+        }
+        input[type="text"]:focus { border-color: var(--primary); outline: none; }
+        
+        .btn {
+            display: inline-block; padding: 12px 20px; border: none; border-radius: 6px;
+            font-size: 1.1em; font-weight: bold; cursor: pointer; text-align: center;
+            transition: background-color 0.3s; color: white; text-decoration: none;
+        }
+        .btn-primary { background-color: var(--success); width: 100%; margin-top: 15px; }
+        .btn-primary:hover { background-color: #218838; }
+        .btn-nav { background-color: #6c757d; }
+        .btn-nav:hover { background-color: #5a6268; }
+        .btn-nav:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        /* Progress Bar */
+        .progress-container { width: 100%; background: #ddd; border-radius: 5px; margin-bottom: 20px; overflow: hidden; height: 20px; }
+        .progress-bar { height: 100%; background: var(--success); color: white; text-align: center; line-height: 20px; font-size: 0.8em; transition: width 0.3s; width: 0%; }
+
+        /* Quiz Area */
+        .question-text { font-size: 1.2em; font-weight: bold; margin-bottom: 20px; line-height: 1.6; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .option-label {
+            display: flex; align-items: center; padding: 12px 15px; border: 1px solid #eee;
+            border-radius: 8px; cursor: pointer; transition: all 0.2s; background: #fdfdfd;
+        }
+        .option-label:hover { background: #f0f8ff; border-color: #add8e6; }
+        .option-label input[type="radio"] { margin-left: 12px; transform: scale(1.3); accent-color: var(--primary); }
+        .option-label.selected { background: #d4edda; border-color: var(--success); font-weight: bold; color: #155724; }
+
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 25px; }
+        .nav-buttons .btn { width: 48%; }
+
+        /* Results Area */
+        .score-box { text-align: center; background: #e9ecef; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .score-box h2 { margin: 0 0 10px 0; font-size: 1.4em; }
+        .score-value { font-size: 2em; color: var(--primary); font-weight: bold; }
+        .recommendation-box { padding: 20px; border-radius: 8px; border: 1px solid #ddd; background: #fdfdfd; margin-bottom: 20px; }
+        .recommendation-box h3 { text-align: right; border-bottom: 2px solid; padding-bottom: 10px; margin-top: 0; }
+        .status-mild h3 { border-color: var(--success); color: var(--success); }
+        .status-moderate h3 { border-color: var(--warning); color: #d39e00; }
+        .status-severe h3 { border-color: var(--danger); color: var(--danger); }
+        .recommendation-box ul { padding-right: 20px; line-height: 1.8; }
+        .info-alert { background: #e7f3fe; color: #31708f; padding: 12px; border-radius: 6px; text-align: center; margin-bottom: 20px; font-size: 0.9em; }
+        
+        .actions { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        .actions .btn { width: auto; flex: 1; }
+
+        @media (max-width: 576px) {
+            .container { padding: 20px; }
+            h1 { font-size: 1.4em; }
+            .nav-buttons .btn { font-size: 1em; padding: 10px; }
+        }
+        
+        /* استایل‌های چاپ */
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; padding: 0; display: none; }
+            .container.active { display: block; }
+            .actions, .info-alert, .progress-container { display: none !important; }
+            .score-box { border: 1px solid #ccc; }
+            .header-print { display: block !important; text-align: center; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+        }
+        .header-print { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- 1. صفحه شروع -->
+    <div id="start-screen" class="container active">
+        <h1>🔶 پرسشنامه تشخیص ADHD (والدین)</h1>
+        <h3>طراح آزمون: احسان افشارمنش (مشاور تحصیلی و روانشناس بالینی)</h3>
+        <div class="form-group">
+            <label>نام فرزند:</label>
+            <input type="text" id="inp-name" placeholder="نام را وارد کنید">
+        </div>
+        <div class="form-group">
+            <label>نام خانوادگی:</label>
+            <input type="text" id="inp-family" placeholder="نام خانوادگی را وارد کنید">
+        </div>
+        <div class="form-group">
+            <label>شماره تلفن ولی:</label>
+            <input type="tel" id="inp-phone" placeholder="مثال: 09123456789">
+        </div>
+        <button class="btn btn-primary" onclick="startQuiz()">شروع آزمون</button>
+    </div>
+
+    <!-- 2. صفحه آزمون -->
+    <div id="quiz-screen" class="container">
+        <h1>🔶 پرسشنامه تشخیص ADHD (والدین)</h1>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar">0%</div>
+        </div>
+        <div class="question-text" id="question-text">متن سوال...</div>
+        <div class="options" id="options-container">
+            <!-- گزینه‌ها توسط جاوااسکریپت ساخته می‌شوند -->
+        </div>
+        <div class="nav-buttons">
+            <button class="btn btn-nav" id="btn-prev" onclick="prevQuestion()">→ سوال قبل</button>
+            <button class="btn btn-nav" id="btn-next" onclick="nextQuestion()">سوال بعد ←</button>
+        </div>
+    </div>
+
+    <!-- 3. صفحه نتایج -->
+    <div id="result-screen" class="container">
+        <div class="header-print">
+            <h1>نتایج آزمون تشخیص ADHD (والدین)</h1>
+            <p id="print-name"></p>
+            <p id="print-date"></p>
+        </div>
+        
+        <div class="info-alert">
+            ℹ️ این آزمون یک ابزار غربالگری اولیه است و به هیچ عنوان جایگزین تشخیص قطعی توسط متخصص نمی‌باشد.
+        </div>
+
+        <div class="score-box">
+            <h2 id="result-name"></h2>
+            <p>امتیاز کل کسب شده:</p>
+            <div class="score-value" id="result-score">0</div>
+            <p>از 81</p>
+        </div>
+
+        <div class="recommendation-box" id="recommendation-box">
+            <h3 id="rec-title">وضعیت</h3>
+            <ul id="rec-list">
+                <!-- لیست توصیه‌ها -->
+                <hr>
+                <li style="font-weight:bold; list-style:none;">تلفن اورژانس اجتماعی (۲۴ ساعته): ۱۲۳</li>
+                <li style="font-weight:bold; list-style:none;">تلفن اورژانس دانش آموزی (۸ صبح تا ۸ شب): ۱۵۷۰</li>
+            </ul>
+        </div>
+
+        <div class="actions">
+            <button class="btn" style="background:#17a2b8;" onclick="window.print()">🖨️ چاپ نتایج</button>
+            <button class="btn" style="background:#6c757d;" onclick="location.reload()">شروع مجدد آزمون</button>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // ⚠️ لینک Apps Script خود را اینجا جایگزین کنید ⚠️
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxztiu0NHwcMGREwVNJ7D01KbWkO-3EuoSmG4egQYjBJAJINgjEAbvjpj4S_HCAyeMfsw/exec";
+        // ==========================================
+
+        // لیست سوالات (دقیقاً مشابه نسخه پایتون)
+        const questions = [
+            "بی‌توجه است، حواسش به راحتی پرت می‌شود.",
+            "عصبانی و خشمگین است.",
+            "در انجام دادن یا تمام کردن تکالیف مشکل دارد.",
+            "همیشه در حال حرکت است یا طوری عمل می‌کند که انگار با یک موتور حرکت می‌کند.",
+            "مدت زمان توجه و تمرکز او کوتاه است.",
+            "با بزرگترها مشاجره می‌کند.",
+            "دست یا پاهایش را تکان می‌دهد یا در جای خود وول می‌خورد.",
+            "در تمام کردن تکالیفش ناموفق است.",
+            "کنترل کردن او در فروشگاه‌های بزرگ یا هنگام خرید از مغازه دشوار است.",
+            "در خانه یا مدرسه بی‌نظم و به هم ریخته است.",
+            "کنترل خود را از دست می‌دهد.",
+            "برای انجام تکالیف نیاز به نظارت از نزدیک دارد.",
+            "فقط وقتی به چیزی علاقمند باشد به آن توجه می‌کند.",
+            "در موقعیت‌های نامناسب به شدت می‌دود یا بالا و پایین می‌رود.",
+            "حواس‌پرت است یا مدت زمان توجه و تمرکز او مشکل دارد.",
+            "تحریک‌پذیر است.",
+            "از مشغول شدن به تکالیفی که نیازمند تلاش ذهنی مدام است اجتناب می‌کند یا اکراه نشان می‌دهد.",
+            "بی‌قرار است و وول می‌خورد.",
+            "وقتی برای انجام کاری دستور می‌گیرد حواسش پرت می‌شود.",
+            "به طور جدی با درخواست بزرگترها مخالفت می‌کند یا از انجام آن خودداری می‌نماید.",
+            "در تمرکز پیدا کردن در کلاس مشکل دارد.",
+            "در انتظار کشیدن در صف یا منتظر نوبت ماندن در بازی‌ها مشکل دارد.",
+            "جای خود را در کلاس یا سایر موقعیت‌هایی که انتظار می‌رود در جای خود باقی بماند ترک می‌کند.",
+            "عمداً کارهایی می‌کند که دیگران را آزار دهد.",
+            "دستورات را پیگیری نمی‌کند و در تمام کردن وظایف خود ناموفق است.",
+            "برای او مشکل است که به آرامی بازی کند یا به فعالیت‌های سرگرم‌کننده مشغول باشد.",
+            "به راحتی در تلاش‌هایش مایوس می‌شود."
+        ];
+
+        const optionsData = [
+            { text: "هرگز", value: 0 },
+            { text: "گاهی", value: 1 },
+            { text: "اغلب", value: 2 },
+            { text: "خیلی زیاد", value: 3 }
+        ];
+
+        let userInfo = {};
+        let answers = new Array(27).fill(null);
+        let currentIndex = 0;
+
+        // شروع آزمون
+        function startQuiz() {
+            const name = document.getElementById('inp-name').value.trim();
+            const family = document.getElementById('inp-family').value.trim();
+            const phone = document.getElementById('inp-phone').value.trim();
+
+            if (!name || !family || !phone) {
+                alert("لطفاً تمام اطلاعات (نام، نام خانوادگی و شماره تلفن) را وارد کنید!");
+                return;
+            }
+
+            // اعتبارسنجی ساده شماره تلفن
+            if (phone.length < 10) {
+                alert("لطفاً یک شماره تلفن معتبر وارد کنید.");
+                return;
+            }
+
+            userInfo = { name, family, phone };
+            currentIndex = 0;
+            
+            document.getElementById('start-screen').classList.remove('active');
+            document.getElementById('quiz-screen').classList.add('active');
+            renderQuestion();
+        }
+
+        // نمایش سوال
+        function renderQuestion() {
+            const qText = document.getElementById('question-text');
+            const optsContainer = document.getElementById('options-container');
+            const btnPrev = document.getElementById('btn-prev');
+            const btnNext = document.getElementById('btn-next');
+            
+            // آپدیت نوار پیشرفت
+            const progress = ((currentIndex) / questions.length) * 100;
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = `${progress}%`;
+            progressBar.innerText = `سوال ${currentIndex + 1} از ${questions.length}`;
+
+            // متن سوال
+            qText.innerText = `${currentIndex + 1}. ${questions[currentIndex]}`;
+
+            // ساخت گزینه‌ها
+            optsContainer.innerHTML = '';
+            optionsData.forEach(opt => {
+                const label = document.createElement('label');
+                label.className = 'option-label';
+                if (answers[currentIndex] === opt.value) {
+                    label.classList.add('selected');
+                }
+
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = 'q_option';
+                radio.value = opt.value;
+                radio.checked = (answers[currentIndex] === opt.value);
+                
+                // با کلیک روی رادیو
+                radio.onchange = () => {
+                    answers[currentIndex] = opt.value;
+                    // آپدیت ظاهر گزینه‌ها
+                    document.querySelectorAll('.option-label').forEach(l => l.classList.remove('selected'));
+                    label.classList.add('selected');
+
+                    // رفتن خودکار به سوال بعدی با کمی تاخیر
+                    if (currentIndex < questions.length - 1) {
+                        setTimeout(nextQuestion, 300);
+                    }
+                };
+
+                const span = document.createElement('span');
+                span.innerText = opt.text;
+
+                label.appendChild(radio);
+                label.appendChild(span);
+                optsContainer.appendChild(label);
+            });
+
+            // مدیریت دکمه‌ها
+            btnPrev.disabled = (currentIndex === 0);
+            
+            // متن دکمه بعدی در سوال آخر
+            if (currentIndex === questions.length - 1) {
+                btnNext.innerText = "مشاهده نتیجه ✓";
+            } else {
+                btnNext.innerText = "سوال بعد ←";
+            }
+        }
+
+        // سوال بعدی
+        function nextQuestion() {
+            if (answers[currentIndex] === null) {
+                alert("لطفاً یک گزینه را انتخاب کنید.");
+                return;
+            }
+
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            } else {
+                finishQuiz(); // اگر سوال آخر بود، آزمون تمام شود
+            }
+        }
+
+        // سوال قبلی
+        function prevQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderQuestion();
+            }
+        }
+
+        // پایان آزمون و محاسبه نمره
+        function finishQuiz() {
+            // بررسی اینکه آیا به همه سوالات پاسخ داده شده یا نه
+            if (answers.includes(null)) {
+                alert("لطفاً به تمام سوالات پاسخ دهید.");
+                return;
+            }
+
+            document.getElementById('quiz-screen').classList.remove('active');
+            document.getElementById('result-screen').classList.add('active');
+
+            // محاسبه نمره
+            const totalScore = answers.reduce((a, b) => a + b, 0);
+            
+            // نمایش اطلاعات
+            document.getElementById('result-name').innerText = `${userInfo.name} ${userInfo.family}`;
+            document.getElementById('result-score').innerText = totalScore;
+            
+            // تاریخ امروز
+            const today = new Date().toLocaleDateString('fa-IR');
+            document.getElementById('print-name').innerText = `نام: ${userInfo.name} ${userInfo.family}`;
+            document.getElementById('print-date').innerText = `تاریخ آزمون: ${today}`;
+
+            // منطق توصیه‌ها
+            const box = document.getElementById('recommendation-box');
+            const title = document.getElementById('rec-title');
+            const list = document.getElementById('rec-list');
+
+            box.className = 'recommendation-box'; // ریست کلاس‌ها
+
+            if (totalScore <= 20) {
+                box.classList.add('status-mild');
+                title.innerText = "🟢 وضعیت: علائم خفیف یا احتمال پایین ADHD";
+                list.innerHTML = `
+                    <li>توصیه می‌شود برنامه‌ریزی منظمی برای فعالیت‌های روزانه فرزندتان داشته باشید.</li>
+                    <li>مشاوره با روانشناس کودک برای بررسی دقیق‌تر توصیه می‌شود.</li>
+                    <hr>
+                    <li style="font-weight:bold; list-style:none;">تلفن اورژانس اجتماعی (۲۴ ساعته): ۱۲۳</li>
+                    <li style="font-weight:bold; list-style:none;">تلفن اورژانس دانش آموزی (۸ صبح تا ۸ شب): ۱۵۷۰</li>
+                `;
+            } else if (totalScore <= 50) {
+                box.classList.add('status-moderate');
+                title.innerText = "🟡 وضعیت: علائم متوسط یا احتمال متوسط ADHD";
+                list.innerHTML = `
+                    <li>توصیه اکید به مراجعه به روانشناس یا روانپزشک کودک دارید.</li>
+                    <li>استفاده از تکنیک‌های رفتاری برای مدیریت تمرکز در خانه و مدرسه.</li>
+                    <li>هماهنگی با مشاور مدرسه برای پیگیری وضعیت تحصیلی.</li>
+                    <hr>
+                    <li style="font-weight:bold; list-style:none;">تلفن اورژانس اجتماعی (۲۴ ساعته): ۱۲۳</li>
+                    <li style="font-weight:bold; list-style:none;">تلفن اورژانس دانش آموزی (۸ صبح تا ۸ شب): ۱۵۷۰</li>
+                `;
+            } else {
+                box.classList.add('status-severe');
+                title.innerText = "🔴 وضعیت: علائم شدید یا احتمال بالای ADHD";
+                list.innerHTML = `
+                    <li>ضروری است در اسرع وقت با یک روانپزشک کودک و نوجوان مشورت کنید.</li>
+                    <li>درمان‌های رفتاری و در صورت تشخیص پزشک، دارودرمانی می‌تواند بسیار کمک‌کننده باشد.</li>
+                    <li>آموزش خانواده برای نحوه برخورد صحیح با کودک در این شرایط توصیه می‌شود.</li>
+                    <hr>
+                    <li style="font-weight:bold; list-style:none;">تلفن اورژانس اجتماعی (۲۴ ساعته): ۱۲۳</li>
+                    <li style="font-weight:bold; list-style:none;">تلفن اورژانس دانش آموزی (۸ صبح تا ۸ شب): ۱۵۷۰</li>
+                `;
+            }
+
+            // ارسال اطلاعات به گوگل شیت
+            sendDataToGoogleSheet(totalScore);
+        }
+
+        // ارسال داده‌ها (AJAX)
+        function sendDataToGoogleSheet(score) {
+            // اگر لینک تنظیم نشده باشد، از ارسال جلوگیری می‌کند
+            if (GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_URL_HERE") {
+                console.warn("لینک Apps Script تنظیم نشده است.");
+                return;
+            }
+
+            const formData = new URLSearchParams();
+            formData.append("name", userInfo.name);
+            formData.append("family", userInfo.family);
+            formData.append("phone", userInfo.phone);
+            formData.append("score", score);
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: formData,
+                mode: 'no-cors' // برای جلوگیری از خطای CORS گوگل
+            })
+            .then(() => console.log("داده با موفقیت ارسال شد."))
+            .catch(err => console.error("خطا در ارسال: ", err));
+        }
+    </script>
+</body>
+</html>
