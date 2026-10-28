@@ -143,7 +143,7 @@
             background: #d4edda;
             box-shadow: 0 4px 12px rgba(40, 167, 69, 0.15);
         }
-        .option-card input[type="radio"] { display: none; }
+        .option-card input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
         .custom-radio {
             width: 22px; height: 22px;
             border: 2px solid #adb5bd;
@@ -419,15 +419,18 @@
                 radio.value = opt.value;
                 radio.checked = (answers[currentIndex] === opt.value);
                 
-                radio.onchange = () => {
+                               label.onclick = (e) => {
+                    e.preventDefault(); // جلوگیری از رفتار پیش‌فرض موبایل
+                    radio.checked = true; // تیک زدن دستی
+                    
                     answers[currentIndex] = opt.value;
                     document.querySelectorAll('.option-card').forEach(l => l.classList.remove('selected'));
                     label.classList.add('selected');
 
-                    // انتقال خودکار به سوال بعدی با تاخیر ملایم
+                    // انتقال خودکار به سوال بعدی
                     if (currentIndex < questions.length - 1) {
                         setTimeout(() => {
-                            nextQuestion(true); // true یعنی از طرف کلیک خودکار
+                            nextQuestion(true);
                         }, 450); 
                     }
                 };
